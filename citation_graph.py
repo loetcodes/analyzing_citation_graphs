@@ -55,30 +55,24 @@ def normalize_distribution(graph, nodes):
   return result_graph
 
 
-def plot_log_graph(size, graph):
-  """ Function that computes the log distribution of a graph by plotting a log of graph of keys against the log of values of a given graph.
-  Returns the points to be plotted.
-  """
-  plotX = []
-  plotY = []
-  for degree, value in graph.items():
-    if degree != 0:
-      plotX.append(math.log(degree))
-      plotY.append(math.log(value))
-  return plotX, plotY
-
-
-def draw_plot(plotX, plotY, xLabel, yLabel, graphTitle):
+def draw_plot(plotX, plotY, xLabel, yLabel, plotName, title="", subtitle="", plotType="log", pointColor="#8116de", xLimit="", yLimit=""):
   """ Draws the plot figure given the x and y values, and the x and y 
   axis labels and the plot title.
   """
   plt.figure(figsize=[7.4,5.8], facecolor="#e8e8e8")
-  plt.figtext(0.2, 0.925, s=graphTitle, fontsize='large')
+  plt.figtext(0.2, 0.945, s=title, fontsize='large')
+  plt.figtext(0.4, 0.9, s=subtitle, fontsize='large')
+  plt.xscale(plotType)
+  plt.yscale(plotType)
+  if xLimit != "":
+    plt.xlim(xLimit[0], xLimit[1])
+  if yLimit != "":
+    plt.ylim(yLimit[0], yLimit[1])
   plt.xlabel(xLabel, fontsize="medium")
   plt.ylabel(yLabel, fontsize="medium")
-  plt.scatter(plotX, plotY, c="#8116de")
-  plt.show()
-
+  plt.scatter(plotX, plotY, c=pointColor)
+  plt.savefig(plotName + ".png")
+  plt.close()
 
 
 
@@ -94,10 +88,13 @@ if __name__ == "__main__":
   normalized_distr = normalize_distribution(unnormalized_distr, nodes)
 
   # Compute the values and then plot the log/log of the normalized distribution.
-  plotX, plotY = plot_log_graph(40, normalized_distr)
+  values = sorted(normalized_distr.items())
+  plotX, plotY = zip(*values)
 
   # Draw the plot.
-  graphTitle = "Normalized Distribution of A Physics Citation graph"
+  plotName = "Physics_Citation_Graph_Distribution"
+  title = "Normalized Distribution of a Physics Citation graph"
+  subtitle = "Nodes=" + str(nodes)
   yLabel = "In-degrees Distribution (log)"
   xLabel = "Degrees (log)"
-  draw_plot(plotX, plotY, xLabel, yLabel, graphTitle)
+  draw_plot(plotX, plotY, xLabel, yLabel, plotName, title, subtitle, "log", "#d92b54", (1e0, 1e4), (1e-5, 1e0))
